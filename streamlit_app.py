@@ -3,36 +3,98 @@ import altair as alt
 import math
 import pandas as pd
 import streamlit as st
+from PIL import Image, ImageOps
+import tensorflow as tf
+import numpy as np
+import cv2
+from plotly.subplots import make_subplots
 
-"""
-# Welcome to Streamlit!
+header = st.container()
+dataset = st.container()
+features = st.container()
+model_training = st.container()
+test = st.container()
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:
+training_data = pd.read_csv("dataset/train.csv")
+testing_data = pd.read_csv("dataset/test.csv")
+healthy = Image.open('dataset/train_2.jpg')
+multiple_diseases = Image.open('dataset/train_1.jpg')
+rust = Image.open('dataset/train_3.jpg')
+scrab = Image.open('dataset/train_7.jpg')
 
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+model = tf.keras.models.load_model('my_model.hdf5')
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+def import_and_predict(image_data, model):
+    size = (128,128)    
+    image = ImageOps.fit(image_data, size, Image.ANTIALIAS)
+    image = np.asarray(image)
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    img_resize = (cv2.resize(img, dsize=(128, 128), interpolation=cv2.INTER_CUBIC))/255.
+    
+    img_reshape = img_resize[np.newaxis,...]
+
+    prediction = model.predict(img_reshape)
+    
+    return prediction
+
+# def prediction(path, prediction):
+#     inputImage = cv2.imread(path)
+#     fig = make_subplots(rows=1, cols=2)
+#     fig.add_trace(go.Image(z=cv2.resize(inputImage, (512, 512))), row=1, col=1)
+#     fig.add_trace(go.Bar(x=["Healthy", "Multiple diseases", "Rust", "Scab"], y=prediction), row=1, col=2)
+#     fig.update_layout(height=512, width=900, title_text="DenseNet", showlegend=False)
+
+with header:
+    st.title('Đề tài xác định bệnh thực vật')
+    st.write('Trong đề tài này, nhóm em tập trung vào việc tìm kiếm dữ liệu, huấn luyện mô hình và kiểm thử')
+
+with dataset:
+    st.header('Dataset')
+    st.write('Dataset sử dụng trong đề tài được lấy ở  Plant Pathology 2020 – FGVC7')
+    st.write('Bộ dữ liệu gồm:')
+    st.write('+ 1 bộ ảnh gồm n tấm ảnh')
+    st.write('+ 1 file train.csv')
+    st.write('+ 1 file test.csv')
+    st.subheader("train.csv")
+    st.write(training_data.head())
+    st.subheader("test.csv")
+    st.write(testing_data.head())
+    st.subheader("Một vài hình ảnh trong dataset")
+    st.image(healthy, caption="Healthy leaves")
+    st.image(multiple_diseases, caption="Leaves with multiple diseases")
+    st.image(rust, caption="Leaves with rust")
+    st.image(scrab, caption="Leaves with scab")
 
 
-with st.echo(code_location='below'):
-    total_points = st.slider("Number of points in spiral", 1, 5000, 2000)
-    num_turns = st.slider("Number of turns in spiral", 1, 100, 9)
+with features:
+    st.header('The features I created')
+    st.write('I found dataset on...')
 
-    Point = namedtuple('Point', 'x y')
-    data = []
+with model_training:
+    st.header('Time to train model')
+    st.write('I found dataset on...')
 
-    points_per_turn = total_points / num_turns
+with test:
+    st.header('Thử nhận biết một số lá')
+    uploaded_file = st.file_uploader("Chọn một lá bất kỳ")
+    if uploaded_file is not None:
+        test_image = "dataset/images/" + uploaded_file.name
+        st.image(test_image, caption="test")
+    
+    result = st.button('Dự đoán')
 
-    for curr_point_num in range(total_points):
-        curr_turn, i = divmod(curr_point_num, points_per_turn)
-        angle = (curr_turn + 1) * 2 * math.pi * i / points_per_turn
-        radius = curr_point_num / total_points
-        x = radius * math.cos(angle)
-        y = radius * math.sin(angle)
-        data.append(Point(x, y))
-
-    st.altair_chart(alt.Chart(pd.DataFrame(data), height=500, width=500)
-        .mark_circle(color='#0068c9', opacity=0.5)
-        .encode(x='x:Q', y='y:Q'))
+    if result:
+        if test_image is None:
+            st.text("Please upload an image file")
+        else:
+            image = Image.open(test_image)
+            prediction = import_and_predict(image, model)
+            if np.argmax(prediction) == 0:
+                st.write("Healthy!")
+            elif np.argmax(prediction) == 1:
+                st.write("Multiple Diseases!")
+            elif np.argmax(prediction) == 2:
+                st.write("Rust!")
+            else: 
+                st.write("Scab!")
+            st.text(prediction)
