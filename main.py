@@ -14,3 +14,11 @@ with header:
 with dataset:
     st.header('Dataset')
     st.text('I found dataset on...')
+
+with features:
+    st.header('The features I created')
+    st.text('I found dataset on...')
+
+with model_training:
+    st.header('Time to train model')
+    st.text('I found dataset on...')
