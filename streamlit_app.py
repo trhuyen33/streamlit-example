@@ -37,13 +37,6 @@ def import_and_predict(image_data, model):
     
     return prediction
 
-# def prediction(path, prediction):
-#     inputImage = cv2.imread(path)
-#     fig = make_subplots(rows=1, cols=2)
-#     fig.add_trace(go.Image(z=cv2.resize(inputImage, (512, 512))), row=1, col=1)
-#     fig.add_trace(go.Bar(x=["Healthy", "Multiple diseases", "Rust", "Scab"], y=prediction), row=1, col=2)
-#     fig.update_layout(height=512, width=900, title_text="DenseNet", showlegend=False)
-
 with header:
     st.title('Đề tài xác định bệnh thực vật')
     st.write('Trong đề tài này, nhóm em tập trung vào việc tìm kiếm dữ liệu, huấn luyện mô hình và kiểm thử')
