@@ -1,6 +1,4 @@
-# Welcome to Streamlit!
+# ISC Internship AI Developer Project
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:
-
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+Giảng viên hướng dẫn: TS Nguyễn Quốc Huy
+Chuyên gia hướng dẫn: TS Bùi Tiến Lên
